@@ -78,7 +78,9 @@ def load_data():
     df_classes = df[["class"]].drop_duplicates().rename(columns={"class": "class_code"})
     df_classes.to_sql("orbit_classes", engine, if_exists="replace", index=False)
 
-    print("Tables has been successfully created!")
+    add_constraints(engine)
+
+    print("Tables and constraints have been successfully created!")
 
 # adding constraints to specify relationship among tables
 def add_constraints(engine):
