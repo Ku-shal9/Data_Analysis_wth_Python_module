@@ -73,7 +73,7 @@ Access the PostgreSQL CLI inside the running container:
 docker exec -it asteroids-postgres psql -U postgres -d asteroids_db
 ```
 
-![Query Output](screenshots/query_execution.png)
+![Query Output](ERD/query_execution.png)
 
 ### Sample Queries
 
