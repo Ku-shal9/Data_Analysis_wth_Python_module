@@ -33,6 +33,14 @@ def get_engine():
 def load_data():
     engine = get_engine()
     
+    # dropping previously created table to avoid conflicts
+    with engine.begin() as conn:
+        conn.execute(text("""
+                          DROP TABLE IF EXISTS orbital_parameters, 
+                          physical_properties, class_summary, 
+                          asteroids, orbit_classes CASCADE;
+                          """))
+    
     # asteroids table
     df_asteroids = df[[
         "spkid", "full_name", "class", "orbit_id", "neo_flag", "pha_flag", "orbit_shape"
@@ -71,6 +79,32 @@ def load_data():
     df_classes.to_sql("orbit_classes", engine, if_exists="replace", index=False)
 
     print("Tables has been successfully created!")
+
+# adding constraints to specify relationship among tables
+def add_constraints(engine):
+    with engine.begin() as conn:
+        # Primary Keys
+        conn.execute(text("ALTER TABLE orbit_classes ADD PRIMARY KEY (class_code);"))
+        conn.execute(text("ALTER TABLE asteroids ADD PRIMARY KEY (spkid);"))
+        conn.execute(text("ALTER TABLE orbital_parameters ADD PRIMARY KEY (spkid);"))
+        conn.execute(text("ALTER TABLE physical_properties ADD PRIMARY KEY (spkid);"))
+        conn.execute(text("ALTER TABLE class_summary ADD PRIMARY KEY (class);"))
+
+        # Foreign Keys
+        conn.execute(text("""
+                          ALTER TABLE asteroids ADD CONSTRAINT fk_asteroids_class FOREIGN KEY (class)
+                          REFERENCES orbit_classes(class_code);
+                          """))
+        conn.execute(text("""ALTER TABLE orbital_parameters ADD CONSTRAINT fk_orbital_spkid FOREIGN KEY (spkid) 
+                          REFERENCES asteroids(spkid) ON DELETE CASCADE;
+                          """))
+        conn.execute(text("""ALTER TABLE physical_properties ADD CONSTRAINT fk_physical_spkid 
+                          FOREIGN KEY (spkid) REFERENCES asteroids(spkid) ON DELETE CASCADE;
+                          """))
+        conn.execute(text("""ALTER TABLE class_summary ADD CONSTRAINT fk_summary_class 
+                          FOREIGN KEY (class) REFERENCES orbit_classes(class_code);
+                          """))
+
 
 if __name__ == "__main__":
     load_data()
