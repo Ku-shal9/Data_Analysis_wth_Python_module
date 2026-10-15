@@ -50,11 +50,11 @@ docker compose up -d
 Ensure your `.env` contains:
 
 ```env
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=asteroids_db
-DB_USER=postgres
-DB_PASSWORD=secret
+DB_HOST= *specify_your_host*
+DB_PORT= *specify_your_port*
+DB_NAME= *specify_your_db_name*
+DB_USER= *specify_your_db_user*
+DB_PASSWORD= *specify_your_db_password*
 ```
 
 ### 3. Run the Loader
